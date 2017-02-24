@@ -1,0 +1,10 @@
+extends layout
+
+block content
+  h1  MongoDB User Authentication
+  #container.col
+    p Below is your profile information!
+    p Username:
+    a()= user.username
+    p Password:
+    a()= user.password
