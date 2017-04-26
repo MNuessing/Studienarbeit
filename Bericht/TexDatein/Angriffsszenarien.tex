@@ -1,3 +1,17 @@
-\chapter{Angriffsszenarien}
-\section{mögliche Angriffsszenarien}
-\subsection{gewähltes Angriffsszenario}
+\chapter{Sicherheitslücken}
+\section{mögliche Sicherheitslücken}
+\begin{itemize}
+	\item Erklärung mehrerer Angriffsszenarien (OWASP TOP 10)
+	\item Vor- und Nachteile der Angriffsszenarien, sowie momentane Bedeutung
+	\item Unter Umständen Zusammenspiel von verschiedenen Angriffsszenarien
+	\item Unter Umständen bekannte große Hackerangriffe
+\end{itemize}
+\subsection{gewähltes Sicherheitslücken}
+\begin{itemize}
+	\item genaue Erklärung des Angriffsszenario
+	\item erklären, warum genau dieses Angriffsszenario
+\end{itemize}
+In dieser Arbeit habe ich mich für die Sicherheitslücke \enquote{Fehler in Authentifizierung und Session-Management} entschieden. Der Grund dazu war, dass es schon seit längerem zu einer der Top Schwachstellen gehört und es in dem SEED Projekt noch nicht behandelt wurde. Diese Schwachstelle nutzt zum die Schwachstelle \enquote{Cross-Site Scipting}, \enquote{Verlust der Vertraulichkeit sensibler Daten} und zusätzliche Angriffsszenarien. \\
+Sollten die Passwörter nicht geschützt gespeichert sein (Hashverfahren oder Verschlüsselung), so ist es möglich, dass der Angreifer das Passwort bekommen kann. Auch kann der Angreifer an die Daten gelangen, wenn er das Passwort erraten kann, es durch Benutzermanagement verändern kann, oder das Passwort auf unsicheren Wegen übertragen wird. Zusätzlich zu den Passwörtern zählt zu dieser Sicherheitslücke auch sollte der Angreifer an die Session-ID des Opfers gelangen. Der Angreifer kann an die Session durch mehrere Möglichkeiten bekommen. Er kann sie bekommen, indem die Session-ID in der URL sichtbar ist oder die Session-IDs nicht ablaufen beziehungsweise Benutzersitzungen oder Authentifizierungs-Token werden be dem Ausloggen nicht ungültig. Eine weitere Möglichkeit an die Session-ID zu kommen ist, wenn sich die Session-ID nicht ändert, wenn sich ein Benutzer erfolgreich anmeldet. \\
+\subsubsection{Beispiel der Sicherheitslücke}
+Angenommen eine Seite hat die Session-ID in der URL drin. Dies sollte wie oben schon beschrieben vermieden werden. Der Grund dafür ist, dass ein authentifizierter Anwender etwas auf dieser Seite gut findet und es seinen Freunden mitteilen möchte. Da er dieses Angriffsszenario nicht kennt oder es ihm nicht auffällt kopiert er die gesamte URL und schickt sie seinen Freunden. Sollten die Freunde nun auf diesen Link klicken, sind sie dank der Session-ID als diejenige Person angemeldet.
