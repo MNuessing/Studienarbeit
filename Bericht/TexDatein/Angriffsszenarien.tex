@@ -1,12 +1,74 @@
 \chapter{Sicherheitslücken}
-\section{mögliche Sicherheitslücken}
-\begin{itemize}
-	\item Erklärung mehrerer Angriffsszenarien (OWASP TOP 10)
-	\item Vor- und Nachteile der Angriffsszenarien, sowie momentane Bedeutung
-	\item Unter Umständen Zusammenspiel von verschiedenen Angriffsszenarien
-	\item Unter Umständen bekannte große Hackerangriffe
-\end{itemize}
-\subsection{gewähltes Sicherheitslücken}
+\section{Mögliche Sicherheitslücken}
+Es gibt sehr viele Angriffsszenarien, welche auf eine Webseite ausgeführt werden können. Jede Webseite sollte sich im besten Fall gegen alle Angriffe schützen und somit keine Sicherheitslücken zu haben. Allerdings gibt es sehr viele Angriffe die unterschiedlich schwer, unterschiedliche Folgen, unterschiedlich erkennbar und unterschiedlich populär sind. Die momentan Top Sicherheitslücken sind in der Top 10 Liste der oben genannten Organisation OWASP aufgelistet. Ich werde mich in dieser Arbeit auf die von der Erstellung der Arbeit aktuellsten Liste berufen, welche von dem Jahr 2017 ist. \\
+Die Top Ten Listen von OWASP wurden veröffentlicht um die am meist kritischen Risiken zu zeigen. Es soll Unternehmen helfen, mit ihrer eigenen Anwendungssicherheit zu starten und von den Fehlern anderer Unternehmen zu lernen. 
+\subsection{Injection}
+Eine sehr bekannte Sicherheitslücke ist auch die am meist kritische Sicherheitslücke. Der Angriff funktioniert, wenn der Angreifer dem Server Daten schickt, die direkt zum Beispiel in eine SQL Abfrage eingefügt werden.\\
+\begin{lstlisting}[
+language=Java,
+showspaces=false,
+basicstyle=\ttfamily,
+numbers=left,
+numberstyle=\tiny,
+commentstyle=\color{gray},
+caption=Injection,
+label=lst:injection
+]
+String query = "SELECT * FROM tabA WHERE colA='" +request.getParameter("parA") + "'";
+\end{lstlisting}
+Der in Listing \ref{lst:injection} gezeigte SQL Statement ist ein Beispiel für eine Injection. Bei einem normalen Parameter von \enquote{parA} ist kein fehlerhaftes Verhalten zu erkennen. Sollte allerdings zum Beispiel \enquote{dummy' OR '1'='1} übergeben werden, wird der Wert in \enquote{colA} mit \enquote{dummy} verglichen. Allerdings werden auch alle Einträge selektiert, bei denen \enquote{'1'='1'} erfüllt ist, was immer wahr entspricht und somit alle Einträge ausgelesen werden. Somit würde die Abfrage nach colA komplett egal sein. Dies ist jetzt nur ein Beispiel zum Auslesen einer gesamten Tabelle. Allerdings könnten mit der Methode auch verschiedene SQL Statements ausgeführt werden, wie das löschen der Daten. \\
+Jeder der unvertraute Daten an dem Server schicken kann, ist in der Lage, diesen Angriff auszuführen. Da der Angreifer lediglich ein textbasierten Angriff versenden muss, welcher die Syntax eines Interpreter ausnutzt kann es auf fast allen Daten ausgeführt werden. Diese Sicherheitslücke ist recht einfach zu erkennen, wenn auf den Code geschaut wird, jedoch schwer, wenn die Anwendung nur getestet wird. Die technischen Folgen dieses Angriffes können sehr unterschiedlich sein. Sie können von der Veränderung oder Verlust von Daten bis hin zur Übernahme des gesamten Systems. Damit kann mit diesem Angriff an einem Unternehmen ein erheblicher Schaden hinzugefügt werden. \\
+Ein bekannter Angriff war, das im März 2017 eine Sicherheitslücke in Moodle gefunden wurde, die es erlaubte PHP Code auszuführen.
+\subsection{Broken Authentication and Session Management}
+Im Gegensatz zu der Sicherheitslücke \enquote{Injection} ist diese Sicherheitslücke nicht so einfach auszunutzen. Trotzdem kann diese Sicherheitslücke sehr schwere folgen haben. \\
+Diese Sicherheitslücke nutzen anonyme externe Angreifer, autorisierte Benutzer, die einen anderen Account klauen wollen, sowie Insider, die ihre Handlungen verbergen wollen. Dazu versucht der Angreifer ungeschützte Accounts, Passwörter oder Session IDs zu erhalten. Diese Fehler treten dann auf, wenn Entwickler ihre eigene Authentifikation und ihr eigenes Session Management entwerfen. Dabei entstehen oft Fehler bei den Funktionen Login, Logout, Account erstellen, Passwort vergessen, etc. Da jede Implementierung unterschiedlich ist, kann es sehr schwer sein, diese Fehler zu erkennen. Sollte solch eine Sicherheitslücke vorhanden sein, können alle Accounts angegriffen werden und der Angreifer hat alle Privilegien, welche der eigentliche Account hat. Außerdem geschehen alle seine Handlungen unter Verwendung des angegriffenen Accounts. \\
+Bei dieser Sicherheitslücke sind viele Angriffe möglich, da es viele Möglichkeiten gibt, wie man an einem Fremden Account erhält. Zum einen ist es möglich, dass die Benutzerdaten nicht genug gesichert wurden wie zum Beispiel mittels eines Hashing Algorithmus oder einer Verschlüsselung. Außerdem sollte es nicht möglich sein Passwörter zu überschreiben mittels zum Beispiel den Funktionen Passwort vergessen, Passwort ändern, etc. Zusätzlich sollten Session IDs nicht für den Angreifer erhältlich sein.
+\subsection{Cross-Site Scripting (XSS)}
+Dieser Angriff ist auch sehr bekannt, hat jedoch nicht ganz so schlimme Folgen wie die \enquote{Injection}, auch wenn so ein Angriff schwerwiegende Auswirkung haben kann. \\
+\begin{lstlisting}[
+language=Java,
+showspaces=false,
+basicstyle=\ttfamily,
+numbers=left,
+numberstyle=\tiny,
+commentstyle=\color{gray},
+caption=XSS,
+label=lst:XSS
+]
+String page = "<input name='input' type='TEXT' value='" + request.getParameter("XSS") + "'>";
+\end{lstlisting}
+Die Möglichkeit diesen Angriff auszunutzen ist sehr ähnlich wie bei der \enquote{Injection}. Ein Beispiel ist das Beispiel in Listing \ref{lst:XSS}. In diesem Listing kann der XSS Parameter durch ein Script ersetzt werden, welches zum Beispiel \enquote{'><script>alert('XSS')<\textbackslash script> <input name='A' type='TEXT' value='} sein kann. Dabei wird zum einen der Input geschlossen, anschließend das Script ausgeführt und zum Schluss noch etwas eingefügt, es keine Syntaxfehler gibt. \\
+Die Angreifer können genau die selben wie bei der \enquote{Injection} sein. Auch hier können alle Textbasierten Dateien als Script ausgeführt werden. Dabei wird unterschieden zwischen gespeicherten und zurückgegebenen Werte. Beide können auf dem Server ausgeführt werden, was recht einfach zu erkennen ist oder auf dem Client ausgeführt werden, was sehr hart werden kann, diese Sicherheitslücken zu erkennen. Mit diesen Angriff kann unter anderem die Session des Users erhalten werden, der benutze Browser herausgefunden werden oder Maleware genutzt werden, was den Unternehmen erheblichen Schaden zufügen kann.
+
+\subsection{Broken Access Control}
+In dieser Sicherheitslücke geht es um authentifizierte Benutzer, die nicht auf alles Zugriff haben, sowie nicht authentifizierte Benutzer. Beide Gruppen versuchen Daten oder Funktionalitäten zu bekommen, auf die sie keinen Zugriff haben sollten. So kann ein authentifizierter Benutzer in der Abfrage einen Parameter ändern, welcher angibt welcher Gruppe der Benutzer angehört. Wenn durch die Änderung des Parameters der Benutzer zugriff erlangt, war der Angriff erfolgreich. Außerdem kann eine URL abgeändert werden. In sehr vielen Fällen ist es einfach zu erraten, wie so eine URL ober Funktion aussieht, welche aufgerufen werden soll. Wenn anschließend keine weitere Zugriffsüberprüfung erfolgt, kann der Angreifer die Funktionalität ausführen. Somit ist dies einfach zu überprüfen, indem immer sichergestellt wird, welcher Gruppe der Benutzer angehört. \\
+Ein Beispiel dazu ist folgendes: \\
+Nur ein autorisierter Benutzer sollte auf die URL \enquote{http://exampleURL.com/UserInfo} allerdings nur ein Admin sollte auf die URL \enquote{http://exampleURL.com/AdminInfo} Zugriff erhalten. Sollte irgend ein anderer Benutzer Zugriff auf einen der beiden Seiten erhalten, gilt dies als Angriff. 
+\subsection{Security Misconfiguration}
+Diese Sicherheitslücke ist recht einfach auszunutzen. Jeder nicht autorisierter Benutzer, oder Benutzer welche das System gefährden wollen beziehungsweise ihre Aktionen verstecken wollen ist ein potentieller Angreifer. Dazu nutzen sie einen Standard Account, oder andere Wege wie zum Beispiel nicht gesicherte Daten um Zugriff oder Wissen über das System zu erlangen. Die Fehlkonfiguration kann jederzeit und überall im Code auftreten, egal ob in dem Webserver, in der Datenbank, in Frameword, in der Plattform, oder ähnlichem. Allerdings können automatische Scanner diese Sicherheitslücke sehr leicht entdecken. Mit diesen Angriff hat ein Angreifer Zugriff auf einen Teil der Daten oder Funktionalitäten, auf die er keinen Zugriff haben sollte. Je nachdem nach der Schwere der Sicherheitslücke können alle Daten und Funktionalitäten des Systems davon betroffen sein. \\
+Diese Sicherheitslücke kann zum Beispiel ausgenutzt werden, wenn ein Entwickler vergisst, ein Standard Account zu löschen. Nun braucht der Angreifer nur nach den Login Daten des Standard Accounts zu googeln und so hat er Zugriff auf sämtliche Daten. Ein bekannter Angriff war die Sicherheitslücke von Patreon. Patreon hat einen Werkzeug-Debugger verwendet, welcher es einem Benutzer auf einer Konsole erlaubt Code auf dem Server auszuführen. Diese Konsole kann allerdings überall über das Internet aufgerufen werden. Sollte ein Fehler erzeugt werden, öffnet sich die Konsole und es wird ein geheimen Schlüssel auf der Konsole ausgegeben. Mit diesen Schlüssel ist es möglich Befehle auf der Konsole auszuführen. Die Folgen dieses Angriffes waren, dass Daten von der Webseite veröffentlicht wurden.
+\subsection{Sensitive Data Exposure}
+Diese Sicherheitslücke ist recht schwer auszunutzen, jedoch wenn ein Angreifer in der Lage ist solch eine Sicherheitslücke auszunutzen, so können die Folgen sehr schwer sein. \\
+Um diesen Angriff auszuführen, muss der Angreifer Zugriff auf die sensitiven Daten beziehungsweise auf die Backups haben. Dabei versucht der Angreifer im Normalfall nicht die Verschlüsselung zu brechen, sondern versucht zum Beispiel die Schlüssel zu erlangen, oder führt einen Man-In-The-Middle Angriff durch. Um es den Angreifer schwerer zu machen, sollten die wichtigen Daten mit einer starken Verschlüsselung verschlüsselt werden. Hierbei ist insbesondere auch die Schlüsselgeneration wichtig ist. Angreifer, die keinen Zugriff auf das System haben, haben es schwer Sicherheitslücken auf dem Server zu finden. Sollte ein Angreifer Erfolg haben, hat dieser vollen Zugriff auf die Daten. \\
+Sollte zum Beispiel eine Seite bei der Übertragung keine Verschlüsselung besitzen, sondern sendet den Benutzername, Passwort und andere wichtige Informationen unverschlüsselt, kann ein Angreifer diese Daten einfach abfangen.
+\subsection{Insufficient Attack Protection}
+Insufficient Attack Protection ist eine Sicherheitslücke, welche sehr einfach auszunutzen ist, jedoch ist der Schaden, der durch diese Sicherheitslücke angerichtet werden kann, nicht so hoch. \\
+Jede Person, welche Daten an der Anwendung schicken kann, ist in der Lage diese Sicherheit auszunutzen, wenn die Anwendung immer eine Antwort gibt. Wenn eine Anwendung angegriffen wird, bekommt sie es des öfteren mit, indem zum Beispiel invalider Input gesendet wird, welcher nicht möglich wäre, zu senden. In diesem Fall lehnen die meisten Anwendungen diese Anfrage einfach ab, allerdings hat der Angreifer nun die Möglichkeit weitere Angriffe zu testen, anstatt ihn zu blocken. Sollte ein Angreifer nicht geblockt werden, ist es sehr wahrscheinlich, dass dieser es schafft, eine Sicherheitslücke zu finden. \\
+Wenn eine Anwendung mehrere unnatürliche Anfragen von der selben Person bekommen, sollte diese diesen Benutzer blocken.
+\subsection{Cross-Site Request Forgery}
+Diese Sicherheitslücke ist nicht sehr verbreitet und sehr einfach zu erkennen. Allerdings kann der Schaden immer noch schlimm sein, wenn auch nicht ganz schlimm. \\
+Jeder der irgendeinen Inhalt in den Browser laden kann und sein Opfer dazu bringen kann, eine Anfrage zu senden, ist in der Lage diese Sicherheitslücke auszunutzen. Da die meisten Browser zum Beispiel die Session ID automatisch mit senden, muss der Angreifer die eine mögliche Aktion, die das Opfer ausführen soll, vorbereiten und ihn dazu bringen auf seine Seite zu gehen. Somit fügt der Browser die Daten an dem Anfrage an und sendet sie so der Anwendung. Somit kann der Angreifer alles ausführen, was das Opfer in der Lage wäre, durchzuführen. \\
+Wenn zum Beispiel über ein Link wie zum Beispiel \\ 
+\textcolor{blue}{http://csrf.com/transfer?amout=1000\&destination=1234567} \\ 
+\EUR{1000} von dem eigenen Account zu dem Account 1234567 gesendet wird, wobei der Account 1234567 der Account des Angreifers ist. Dieser Link kann nun in einem Bild als URL eingefügt werden, wie zum Beispiel \\
+\textcolor{blue}{<img src='\textcolor{red}{http://csrf.com/transfer?amout=1000\&destination=1234567}' \\ width='0' height='0'} \\
+Mit dieser Methode würde bei dem Laden der Angreiferseite bei dem senden der Abfrage die Session ID des Opfers hinzugefügt, wenn der Opfer bereits bei der Seite csrf.com autorisiert ist. Somit wird von dem Opfer \EUR{1000} an dem Angreifer überwiesen.
+\subsection{Using Components with Known Vulnerabilities}
+Eine Anwendung besteht meistens aus mehreren fremden Komponenten. Allerdings haben oft viele Komponente bekannte Sicherheitslücken. Selbst wenn die Komponente selber ein Update raus bringt, welches die Sicherheitslücke unmöglich macht, muss die Anwendung selber die neue Version nehmen. Durch Abhängigkeiten zu anderen Komponenten, die die alte Version gebrauchen, wird das ganze Problem noch größer. Auch wissen manche Entwickler überhaupt nicht, welche Komponenten ihre eigene Anwendung alles verwendet. Wenn eine Sicherheitslücke für eine Komponente bekannt ist, muss der Angreifer lediglich entweder automatisch oder manuell diese Sicherheitslücke ausnutzen. Die Anwendungen, welche die alten Komponenten besitzen, sind somit von diesem Angriff angreifbar. \\
+Da die meisten Komponenten alle Privilegien haben, ist es für eine Komponente möglich, entweder durch zum Beispiel einen Error, oder durch eine Backdoor Zufriff auf die Anwendung zu erhalten.
+\subsection{Underprotected APIs}
+Jede Person, welche Anfragen direkt an die API senden kann, ist in der Lage, diese Sicherheitslücke auszunutzen. Dabei sucht der Angreifer, indem er den Code oder die Kommunikation überwacht nach Schwachstellen. Dies kann unter Umständen sehr anspruchsvoll werden. Sowohl statische als auch dynamische Scan-Tools sind nicht immer in der Lage alle Sicherheitslücken zu finden, wodurch auch für den Entwickler es schwer ist, alle Sicherheitslücken zu erkennen. Sollte ein Angreifer Erfolg haben, ist vieles möglich, dass dieser ausnutzen kann. Dies kann zum Beispiel das stehlen von Daten sein, bis hin zur Übernahme des Hosts. \\
+\section{Gewähltes Sicherheitslücken}
 \begin{itemize}
 	\item genaue Erklärung des Angriffsszenario
 	\item erklären, warum genau dieses Angriffsszenario
